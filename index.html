@@ -180,7 +180,14 @@ button.primary:active{background:var(--accent); color:#241a00; transform:scale(.
 .rotate-die-stage{ --size:76px; width:var(--size); height:var(--size); }
 @keyframes isoBounce{0%{transform:rotateX(-30deg) rotateY(-45deg) scale(1);}45%{transform:rotateX(-30deg) rotateY(-45deg) scale(1.18);}100%{transform:rotateX(-30deg) rotateY(-45deg) scale(1);}}
 .rotate-die-stage .iso-cube{ transition:transform .3s ease; }
-.rotate-die-stage.bounce .iso-cube{ animation:isoBounce .5s ease; }
+@keyframes bounceN{0%{transform:rotateX(-30deg) rotateY(-45deg) scale(1);}40%{transform:rotateX(-50deg) rotateY(-45deg) scale(1.14);}100%{transform:rotateX(-30deg) rotateY(-45deg) scale(1);}}
+@keyframes bounceS{0%{transform:rotateX(-30deg) rotateY(-45deg) scale(1);}40%{transform:rotateX(-10deg) rotateY(-45deg) scale(1.14);}100%{transform:rotateX(-30deg) rotateY(-45deg) scale(1);}}
+@keyframes bounceE{0%{transform:rotateX(-30deg) rotateY(-45deg) scale(1);}40%{transform:rotateX(-30deg) rotateY(-22deg) scale(1.14);}100%{transform:rotateX(-30deg) rotateY(-45deg) scale(1);}}
+@keyframes bounceW{0%{transform:rotateX(-30deg) rotateY(-45deg) scale(1);}40%{transform:rotateX(-30deg) rotateY(-68deg) scale(1.14);}100%{transform:rotateX(-30deg) rotateY(-45deg) scale(1);}}
+.rotate-die-stage.bounce-N .iso-cube{ animation:bounceN .5s ease; }
+.rotate-die-stage.bounce-S .iso-cube{ animation:bounceS .5s ease; }
+.rotate-die-stage.bounce-E .iso-cube{ animation:bounceE .5s ease; }
+.rotate-die-stage.bounce-W .iso-cube{ animation:bounceW .5s ease; }
 .rotate-die-stage .iso-face{ font-size:calc(var(--size) * 0.36); }
 
 .hint b{color:var(--text);}
@@ -352,10 +359,10 @@ function setDieFaces(stage, topVal, vertVal, horizVal){
   stage.querySelector('.iso-face.left').innerHTML = FACE_ICON[horizVal];
   stage.querySelector('.iso-face.right').innerHTML = FACE_ICON[horizVal];
 }
-function bounceStage(stage){
-  stage.classList.remove('bounce');
+function bounceStage(stage, dir){
+  ['bounce-N','bounce-S','bounce-E','bounce-W'].forEach(function(c){ stage.classList.remove(c); });
   void stage.offsetWidth;
-  stage.classList.add('bounce');
+  stage.classList.add('bounce-' + dir);
 }
 /* 회전 패널 전용 3D 주사위 */
 let rotateDieStage = null;
@@ -573,7 +580,7 @@ let swiped = false;
 function previewSwipe(dir){
   applyRoll(dir);
   setDieFaces(rotateDieStage, postech.top, postech.vert, postech.horiz);
-  bounceStage(document.getElementById('rotateCenterStage').firstChild);
+  bounceStage(document.getElementById('rotateCenterStage').firstChild, dir);
   swiped = true;
   document.getElementById('rotateCenterStage').classList.add('locked');
   document.getElementById('swipeHint').classList.add('hidden');
@@ -588,7 +595,7 @@ function confirmRotation(){
   document.getElementById('rotatePanel').classList.add('hidden');
   document.getElementById('movePanel').classList.remove('hidden');
 }
-document.getElementById('rotateConfirmBtn').addEventListener('click', confirmRotation);
+document.getElementById('rotateConfirmBtn').addEventListener('pointerup', confirmRotation);
 
 function retrySwipe(){
   postech = { row:2, col:2, top:'가위', horiz:'바위', vert:'보' };
@@ -598,7 +605,7 @@ function retrySwipe(){
   document.getElementById('swipeHint').classList.remove('hidden');
   document.getElementById('rotateConfirm').classList.add('hidden');
 }
-document.getElementById('rotateRetryBtn').addEventListener('click', retrySwipe);
+document.getElementById('rotateRetryBtn').addEventListener('pointerup', retrySwipe);
 
 (function setupRotateSwipe(){
   const stageEl = document.getElementById('rotateCenterStage');
